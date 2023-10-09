@@ -17,7 +17,17 @@ app.use("/calculate", calculateRoute);
 
 app.use(errorHandler);
 
-app.listen(4000, async () => {
-  console.log(`server running on 4000`);
+const PORT = process.env.PORT || 4000;
+
+const server = app.listen(PORT, async () => {
+  console.log(`server running on ${PORT} `);
+
+  //@: Connect database once server is running; this is so the database is not isolated
   await dbConfig();
+});
+
+//@: Handle unhandled promise rejections
+process.on("unhandledRejection", (err: any, promise) => {
+  console.log(`Error: ${err?.message}`);
+  server.close(() => process.exit(1));
 });
